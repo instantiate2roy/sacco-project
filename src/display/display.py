@@ -21,10 +21,12 @@ class Display(ABC):
     """
 
     title: str = "List"
+    subtitle: str = ""             # optional lines under the title, e.g. a summary of the data
     columns: list[str] = []
     sort_by: list[str] = []
     sort_ascending: bool | list[bool] = True
     label_width = "90px"
+    decimals: int | None = 2       # decimal places shown for numbers with fractions; None leaves them as they are
     align_numbers_right = True     #text is left-aligned; numbers stay right-aligned so digits line up
 
     #left-aligns the filter labels; only applies inside the filter grid
@@ -137,6 +139,8 @@ class Display(ABC):
         styled = (rows.style
                   .set_properties(**{"text-align": "left"})
                   .set_table_styles([{"selector": "th", "props": [("text-align", "left")]}]))
+        if self.decimals is not None:
+            styled = styled.format(precision=self.decimals)      # only affects numbers with fractions
         if self.align_numbers_right:
             numbers = list(rows.select_dtypes("number").columns)
             if numbers:
@@ -168,7 +172,9 @@ class Display(ABC):
 
         panel = widgets.VBox(
             [widgets.HTML(self.filter_style),
-             widgets.HTML(f"<h3 style='margin:0 0 8px 0'>{self.title}</h3>"), filters, toolbar],
+             widgets.HTML(f"<h3 style='margin:0 0 8px 0'>{self.title}</h3>"),
+             *([widgets.HTML(f"<div style='margin:0 0 8px 0'>{self.subtitle}</div>")] if self.subtitle else []),
+             filters, toolbar],
             layout=widgets.Layout(border="1px solid #d0d7de", padding="12px 16px",
                                   margin="0 0 12px 0"),
         )
