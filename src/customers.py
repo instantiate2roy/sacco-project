@@ -4,7 +4,7 @@ import pandas as pd
 
 
 @dataclass(frozen=True)
-class CustomerNames:
+class Customer:
     """
     Customers' names as the lists show them: surname, then given name.
 

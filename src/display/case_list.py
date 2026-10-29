@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ..customers import CustomerNames
+from ..customers import Customer
 from .display import Display
 from .filters import ChoiceFilter, RangeFilter, TextFilter
 
@@ -13,7 +13,7 @@ class CaseList(Display):
                "outstanding_balance", "arrears_amount", "next_due_date"]
     sort_by = ["dpd", "outstanding_balance", "account_no"]
     sort_ascending = [False, False, True]
-    missing_customer = CustomerNames.missing          # "(customer not found)"
+    missing_customer = Customer.missing  
     missing_loan_type = "(loan type not found)"
 
     def __init__(self, case_rows: list[dict], customer_rows: list[dict], loan_type_rows: list[dict],
@@ -29,7 +29,7 @@ class CaseList(Display):
             cases[column] = pd.to_numeric(cases[column]).astype(int)
         cases["mia"] = pd.to_numeric(cases["mia"])
 
-        cases = CustomerNames(self.customer_rows, missing=self.missing_customer).add_to(cases)
+        cases = Customer(self.customer_rows, missing=self.missing_customer).add_to(cases)
 
         loan_types = pd.DataFrame(self.loan_type_rows)[["uuid", "name"]].rename(columns={"name": "loan_type"})
         cases = cases.merge(loan_types, how="left", left_on="loan_type_uuid", right_on="uuid",

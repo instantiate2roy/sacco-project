@@ -28,7 +28,7 @@ class Display(ABC):
     align_numbers_right = True     #text is left-aligned; numbers stay right-aligned so digits line up
 
     #left-aligns the filter labels; only applies inside the filter grid
-    FILTER_STYLE = "<style>.sacco-filters .widget-label { text-align: left !important; }</style>"
+    filter_style = "<style>.sacco-filters .widget-label { text-align: left !important; }</style>"
 
     def __init__(self, page_size: int = 50, filter_cols_per_row: int = 3):
         if page_size < 1:
@@ -167,7 +167,7 @@ class Display(ABC):
         )
 
         panel = widgets.VBox(
-            [widgets.HTML(self.FILTER_STYLE),
+            [widgets.HTML(self.filter_style),
              widgets.HTML(f"<h3 style='margin:0 0 8px 0'>{self.title}</h3>"), filters, toolbar],
             layout=widgets.Layout(border="1px solid #d0d7de", padding="12px 16px",
                                   margin="0 0 12px 0"),
