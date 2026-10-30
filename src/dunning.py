@@ -19,7 +19,8 @@ class DunningEngine:
 
     def __init__(self, policy: Policy, contact_rows: list[dict]):
         self.policy = policy
-        contacts = pd.DataFrame(contact_rows)
+        #naming the columns keeps an empty contact list usable
+        contacts = pd.DataFrame(contact_rows, columns=["customer_uuid", "contact_type_id", "value", "valid"])
         valid = contacts[contacts["valid"] == "Y"]
         self.has_mobile = set(valid.loc[valid["contact_type_id"] == "MOBILE_PHONE", "customer_uuid"])
         self.has_email = set(valid.loc[valid["contact_type_id"] == "EMAIL", "customer_uuid"])

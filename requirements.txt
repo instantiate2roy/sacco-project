@@ -1,0 +1,18 @@
+# Python 3.10 or later. Install with: pip install -r requirements.txt
+# Tested with pandas 2.3.3, numpy 2.2.6, scikit-learn 1.7.2, matplotlib 3.10.9, ipywidgets 8.1.9.
+
+# data and the risk model
+pandas>=2.2,<3
+numpy>=1.26,<3
+scikit-learn>=1.4,<2
+joblib>=1.3
+
+# charts, lists and the dashboard in the notebook
+matplotlib>=3.8,<4
+ipywidgets>=8.1,<9
+ipython>=8.0
+jinja2>=3.1            # pandas needs it to style the tables
+ipykernel>=6.0         # runs the notebook in Jupyter or VS Code
+
+# tests
+pytest>=8.0
