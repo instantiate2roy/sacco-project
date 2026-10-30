@@ -28,6 +28,7 @@ class Display(ABC):
     label_width = "90px"
     decimals: int | None = 2       # decimal places shown for numbers with fractions; None leaves them as they are
     align_numbers_right = True     #text is left-aligned; numbers stay right-aligned so digits line up
+    thousands: str | None = None   #e.g. "," to group the digits of large numbers
 
     #left-aligns the filter labels; only applies inside the filter grid
     filter_style = "<style>.sacco-filters .widget-label { text-align: left !important; }</style>"
@@ -43,9 +44,7 @@ class Display(ABC):
 
         self.frame = self.build_frame()
         self.filters = self.build_filters()
-        missing = [column for column in self.columns + self.sort_by if column not in self.frame.columns]
-        if missing:
-            raise DisplayError(f"{type(self).__name__} has unknown columns: {', '.join(missing)}")
+        self._check_columns()
 
         #build and wire up the widgets once, so showing the list twice doesn't double the work
         self._widgets = [f.build(self.frame) for f in self.filters]
@@ -73,6 +72,11 @@ class Display(ABC):
         """
         Return the filters for this list.
         """
+
+    def _check_columns(self) -> None:
+        missing = [column for column in self.columns + self.sort_by if column not in self.frame.columns]
+        if missing:
+            raise DisplayError(f"{type(self).__name__} has unknown columns: {', '.join(missing)}")
 
     def matches(self) -> pd.DataFrame:
         """
@@ -140,7 +144,7 @@ class Display(ABC):
                   .set_properties(**{"text-align": "left"})
                   .set_table_styles([{"selector": "th", "props": [("text-align", "left")]}]))
         if self.decimals is not None:
-            styled = styled.format(precision=self.decimals)      # only affects numbers with fractions
+            styled = styled.format(precision=self.decimals, thousands=self.thousands)  # precision only affects numbers with fractions
         if self.align_numbers_right:
             numbers = list(rows.select_dtypes("number").columns)
             if numbers:
@@ -150,6 +154,12 @@ class Display(ABC):
     def show(self) -> None:
         """
         Draw the filters, the table and the paging controls in the notebook.
+        """
+        display(self.widget())
+
+    def widget(self) -> widgets.VBox:
+        """
+        The filters, the table and the paging controls as one widget, e.g. to place inside a dashboard.
         """
         filters = widgets.GridBox(
             self._widgets,
@@ -179,13 +189,13 @@ class Display(ABC):
                                   margin="0 0 12px 0"),
         )
 
-        display(widgets.VBox([
+        self._refresh()
+        return widgets.VBox([
             panel,
             self._pager_row(self._top_pager, margin="0 0 8px 0"),
             self._table,
             self._pager_row(self._bottom_pager, margin="8px 0 0 0"),
-        ]))
-        self._refresh()
+        ])
 
     def _refresh(self, *_):
         result = self.matches()
