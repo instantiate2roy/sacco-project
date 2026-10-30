@@ -18,7 +18,7 @@ class Policy:
     The raw settings are private: other classes read the policy through its properties and methods.
     """
 
-    # fields a profile rule may test, and the tests it may use
+    #fields a profile rule may test, and the tests it may use
     PROFILE_FIELDS = {"bucket", "dpd", "mia", "outstanding_balance", "outstanding_ratio",
                       "arrears_amount", "reachability", "broken_ptps", "pd", "tier"}
     OPERATORS = {"in", "min", "max", "equals"}
@@ -30,7 +30,7 @@ class Policy:
         try:
             self._check()
         except (KeyError, TypeError, AttributeError) as error:
-            # a safety net: _check names the usual mistakes itself, this catches any shape it didn't expect
+            #check names the usual mistakes itself, this catches any shape it didn't expect
             raise PolicyError(f"The policy is badly formed: {type(error).__name__} {error}") from error
 
     @classmethod
@@ -46,8 +46,6 @@ class Policy:
             raise PolicyError(f"{path.name} is not valid JSON: {error}") from error
         types = [row["type_id"] for row in treatment_type_rows] if treatment_type_rows else None
         return cls(data, types)
-
-    # ---- the policy's parts ---------------------------------------------------
 
     @property
     def buckets(self) -> list[dict]:
@@ -81,10 +79,10 @@ class Policy:
     def compliance(self) -> dict:
         return self._data["compliance"]
 
-    # ---- using the policy -----------------------------------------------------
-
     def bucket_for(self, dpd: int) -> str:
-        """The bucket a loan falls in for its days past due."""
+        """
+        The bucket a loan falls in for its days past due.
+        """
         if dpd < 0:
             raise PolicyError(f"DPD can't be negative: {dpd}")
         for bucket in self.buckets:
@@ -93,7 +91,9 @@ class Policy:
         raise PolicyError(f"No bucket covers a DPD of {dpd}")
 
     def tier_for(self, pd_value: float) -> str:
-        """The risk tier for a probability of default: the first tier whose max_pd is above it."""
+        """
+        The risk tier for a probability of default: the first tier whose max_pd is above it.
+        """
         if not 0 <= pd_value <= 1:
             raise PolicyError(f"PD must be between 0 and 1, not {pd_value}")
         for tier in self.risk_tiers:
@@ -102,7 +102,9 @@ class Policy:
         raise PolicyError(f"No risk tier covers a PD of {pd_value}")
 
     def profile_for(self, facts: dict) -> str:
-        """The first profile, by priority, whose conditions all match; otherwise the default profile."""
+        """
+        The first profile, by priority, whose conditions all match; otherwise the default profile.
+        """
         for rule in self.profiles:
             if all(self._condition_matches(facts.get(field), test)
                    for field, test in rule["conditions"].items()):
@@ -110,7 +112,9 @@ class Policy:
         return self._data["default_profile"]
 
     def treatment_for(self, profile: str, bucket: str) -> str | None:
-        """The treatment for a profile and bucket, or None when the matrix has none."""
+        """
+        The treatment for a profile and bucket, or None when the matrix has none.
+        """
         return self.treatment_matrix.get(profile, {}).get(bucket)
 
     @staticmethod
@@ -126,8 +130,6 @@ class Policy:
         if "max" in test and value > test["max"]:
             return False
         return True
-
-    # ---- tables for the notebook ----------------------------------------------
 
     def buckets_table(self) -> pd.DataFrame:
         measure = self._data["buckets"].get("measure", "dpd").upper()
@@ -149,7 +151,9 @@ class Policy:
         return pd.DataFrame(rows)
 
     def treatment_matrix_table(self) -> pd.DataFrame:
-        """Profiles down the side, overdue buckets across the top, treatments in the cells."""
+        """
+        Profiles down the side, overdue buckets across the top, treatments in the cells.
+        """
         overdue = [b["name"] for b in self.buckets if b["upper"] != 0]
         table = pd.DataFrame(
             [[self.treatment_for(rule["name"], bucket) or "-" for bucket in overdue] for rule in self.profiles],
@@ -158,7 +162,9 @@ class Policy:
         return table
 
     def compliance_tables(self) -> tuple[pd.DataFrame, pd.DataFrame]:
-        """Limits per channel, and the general rules that apply to every contact."""
+        """
+        Limits per channel, and the general rules that apply to every contact.
+        """
         channels = pd.DataFrame([{
             "Channel": name,
             "Max per day": limits["max_per_day"],
@@ -183,7 +189,9 @@ class Policy:
 
     @staticmethod
     def describe(conditions: dict) -> str:
-        """A profile rule's conditions in words, e.g. 'bucket in 61-90, 90+ and reachability ≤ 0.3'."""
+        """
+        A profile rule's conditions in words, like 'bucket in 61-90, 90+ and reachability ≤ 0.3'.
+        """
         parts = []
         for field, test in conditions.items():
             if "in" in test:
@@ -195,8 +203,6 @@ class Policy:
             if "max" in test:
                 parts.append(f"{field} ≤ {test['max']}")
         return " and ".join(parts)
-
-    # ---- checks ---------------------------------------------------------------
 
     def _check(self) -> None:
         if not isinstance(self._data, dict):
@@ -213,7 +219,9 @@ class Policy:
 
     @staticmethod
     def _require(item, keys: list[str], where: str) -> None:
-        """Stop with a clear message when a part of the policy isn't an object or lacks a setting."""
+        """
+        Stop with a clear message when a part of the policy isn't an object or lacks a setting.
+        """
         if not isinstance(item, dict):
             raise PolicyError(f"{where} must be an object, not {type(item).__name__}")
         missing = [key for key in keys if key not in item]
@@ -226,7 +234,9 @@ class Policy:
             raise PolicyError(f"{where} must be a list, not {type(item).__name__}")
 
     def _check_shape(self) -> None:
-        """Every setting the rest of the policy checks, and the system, relies on is present."""
+        """
+        Every setting the rest of the policy checks, and the system, relies on is present.
+        """
         self._require(self._data["buckets"], ["edges"], "buckets")
         self._require_list(self.buckets, "buckets.edges")
         for number, bucket in enumerate(self.buckets, start=1):

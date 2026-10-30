@@ -3,7 +3,7 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-from ..exceptions import ModelError
+from .error import ModelError
 
 
 class FeatureBuilder:

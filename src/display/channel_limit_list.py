@@ -2,7 +2,7 @@ import pandas as pd
 
 from ..policy import Policy
 from .display import Display
-from .filters import ChoiceFilter
+from .choice_filter import ChoiceFilter
 
 
 class ChannelLimitList(Display):

@@ -2,7 +2,7 @@ import pandas as pd
 
 from ..policy import Policy
 from .display import Display
-from .filters import TextFilter
+from .text_filter import TextFilter
 
 
 class ProfileRuleList(Display):

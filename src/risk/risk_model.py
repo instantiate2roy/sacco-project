@@ -1,23 +1,12 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from pathlib import Path
 
 import joblib
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
-from ..exceptions import ModelError
-
-
-@dataclass(frozen=True)
-class ModelEvaluation:
-    """How well a model ranks risk on data it wasn't trained on."""
-    auc: float                 # 0.5 is guessing, 1.0 is perfect ranking
-    rows: int
-    defaults: int
-    default_rate: float
-    bands: pd.DataFrame        # default rate in each score band, lowest risk first
-
+from .error import ModelError
+from .model_evaluation import ModelEvaluation
 
 class RiskModel(ABC):
     """
@@ -81,8 +70,7 @@ class RiskModel(ABC):
         joblib.dump(self, path)
         return path
 
-    @staticmethod
-    def load(path: str | Path) -> "RiskModel":
+    def load(self, path: str | Path) -> "RiskModel":
         """
         Load a model saved with save(). Only load files you created yourself.
         """

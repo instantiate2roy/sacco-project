@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from ..exceptions import ModelError
+from .error import ModelError
 from .risk_model import RiskModel
 
 

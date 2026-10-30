@@ -1,6 +1,7 @@
 import pandas as pd
 
-from .filters import ChoiceFilter, TextFilter
+from .choice_filter import ChoiceFilter
+from .text_filter import TextFilter
 from .history_list import HistoryList
 
 
