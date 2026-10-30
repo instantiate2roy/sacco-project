@@ -1,7 +1,8 @@
 import pandas as pd
 
 from .display import Display
-from .filters import ChoiceFilter, TextFilter
+from .choice_filter import ChoiceFilter
+from .text_filter import TextFilter
 
 
 class CoefficientList(Display):

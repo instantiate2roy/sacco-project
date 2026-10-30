@@ -1,7 +1,7 @@
 import pandas as pd
 
 from .display import Display
-from .filters import TextFilter
+from .text_filter import TextFilter
 
 
 class ModelComparisonList(Display):

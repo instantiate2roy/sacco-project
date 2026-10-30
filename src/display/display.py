@@ -5,8 +5,8 @@ import ipywidgets as widgets
 import pandas as pd
 from IPython.display import display
 
-from ..exceptions import DisplayError
-from .filters import Filter
+from .error import DisplayError
+from .filter import Filter
 
 
 class Display(ABC):

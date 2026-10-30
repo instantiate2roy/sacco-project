@@ -1,7 +1,7 @@
 import pandas as pd
 
 from .display import Display
-from .filters import ChoiceFilter
+from .choice_filter import ChoiceFilter
 
 
 class BucketComparisonList(Display):

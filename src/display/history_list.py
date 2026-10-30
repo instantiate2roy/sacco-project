@@ -1,7 +1,7 @@
 import pandas as pd
 
 from ..customers import Customer
-from ..exceptions import DisplayError
+from .error import DisplayError
 from .display import Display
 
 class HistoryList(Display):

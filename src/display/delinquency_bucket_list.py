@@ -2,7 +2,8 @@ import pandas as pd
 
 from ..policy import Policy
 from .display import Display
-from .filters import RangeFilter, TextFilter
+from .range_filter import RangeFilter
+from .text_filter import TextFilter
 
 
 class DelinquencyBucketList(Display):

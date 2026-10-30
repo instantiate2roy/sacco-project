@@ -3,7 +3,9 @@ from datetime import date
 import pandas as pd
 
 from .display import Display
-from .filters import ChoiceFilter, RangeFilter, TextFilter
+from .choice_filter import ChoiceFilter
+from .range_filter import RangeFilter
+from .text_filter import TextFilter
 
 
 class CustomerList(Display):
